@@ -230,14 +230,18 @@ impl ConwaySim {
         // increment the sim's generation
         self.generation += 1;
 
+        // loop over each cell in the grid
         for row in 0..self.grid.num_rows {
             for col in 0..self.grid.num_cols {
-                let oper_result = self.apply_rules(row, col);
+                // apply rules to the cell
+                let results = self.apply_rules(row, col);
 
-                operations.extend(oper_result);
+                // add any resultant operations to the step's operations list
+                operations.extend(results);
             }
         }
 
+        // apply any operations for this step to the grid
         for operation in operations {
             self.grid.set(operation.row, operation.col, operation.state)
         }
