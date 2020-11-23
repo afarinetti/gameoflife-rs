@@ -1,16 +1,19 @@
 use std::fmt;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 enum CellState {
     Dead,
     Alive,
 }
 
-// impl fmt::Display for CellState {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(f, "{}", self)
-//     }
-// }
+impl fmt::Display for CellState {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            CellState::Alive => write!(f, "ALIVE"),
+            CellState::Dead  => write!(f, "DEAD"),
+        }
+    }
+}
 
 struct Grid {
     num_rows: usize,
@@ -165,7 +168,7 @@ impl Operation {
 
 impl fmt::Display for Operation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Operation[row: {}, col: {}, state: {:?}]", self.row, self.col, self.state)
+        write!(f, "Operation[row: {}, col: {}, state: {}]", self.row, self.col, self.state)
     }
 }
 
