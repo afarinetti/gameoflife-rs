@@ -1,7 +1,7 @@
 use std::fmt;
 
-#[derive(Copy, Clone, PartialEq)]
-enum CellState {
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum CellState {
     Dead,
     Alive,
 }
@@ -15,34 +15,34 @@ impl fmt::Display for CellState {
     }
 }
 
-struct Grid {
-    num_rows: usize,
-    num_cols: usize,
+pub struct Grid {
+    num_rows: u32,
+    num_cols: u32,
     grid: Vec<CellState>,
 }
 
 impl Grid {
-    fn new(num_rows: usize, num_cols: usize) -> Grid {
-        let grid = vec![CellState::Dead; num_rows * num_cols];
+    fn new(num_rows: u32, num_cols: u32) -> Grid {
+        let grid = vec![CellState::Dead; (num_rows * num_cols) as usize];
 
         Grid { num_rows, num_cols, grid }
     }
 
-    fn cell_to_index(&self, row: usize, col: usize) -> usize {
-        (row * self.num_cols) + col
+    fn cell_to_index(&self, row: u32, col: u32) -> usize {
+        ((row * self.num_cols) + col) as usize
     }
 
-    fn get(&self, row: usize, col: usize) -> CellState {
+    fn get(&self, row: u32, col: u32) -> CellState {
         let index = self.cell_to_index(row, col);
         self.grid[index]
     }
 
-    fn set(&mut self, row: usize, col: usize, state: CellState) {
+    fn set(&mut self, row: u32, col: u32, state: CellState) {
         let index = self.cell_to_index(row, col);
         self.grid[index] = state
     }
 
-    fn is_cell_alive(&self, row: usize, col: usize) -> bool {
+    fn is_cell_alive(&self, row: u32, col: u32) -> bool {
         self.get(row, col) == CellState::Alive
     }
 
@@ -59,11 +59,11 @@ impl Grid {
         return alive;
     }
 
-    fn get_neighbor_count(&self, row: usize, col: usize) -> u8 {
+    fn get_neighbor_count(&self, row: u32, col: u32) -> u8 {
         let mut count: u8 = 0;
 
-        let mut new_row: usize;
-        let mut new_col: usize;
+        let mut new_row: u32;
+        let mut new_col: u32;
 
         // 0 1 2
         // 3 X 4
@@ -137,7 +137,7 @@ impl Grid {
     }
 
     fn print(&self) {
-        let divider = "-".repeat((self.num_cols * 2) + 2);
+        let divider = "-".repeat(((self.num_cols * 2) + 2) as usize);
 
         println!("{}", divider);
         for row in 0..self.num_rows {
@@ -155,13 +155,13 @@ impl Grid {
 }
 
 struct Operation {
-    row: usize,
-    col: usize,
+    row: u32,
+    col: u32,
     state: CellState
 }
 
 impl Operation {
-    fn new(row: usize, col: usize, state: CellState) -> Operation {
+    fn new(row: u32, col: u32, state: CellState) -> Operation {
         Operation { row, col, state }
     }
 }
@@ -182,7 +182,7 @@ impl ConwaySim {
         ConwaySim { grid, generation: 0 }
     }
 
-    fn apply_rules(&self, row: usize, col: usize) -> Vec<Operation> {
+    fn apply_rules(&self, row: u32, col: u32) -> Vec<Operation> {
         let mut operations: Vec<Operation> = Vec::new();
 
         // determine the number of live neighbors to the current cell
