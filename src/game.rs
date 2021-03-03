@@ -51,100 +51,6 @@ impl Grid {
         self.grid[index] = state
     }
 
-    pub fn is_cell_alive(&self, row: u32, col: u32) -> bool {
-        self.get(row, col) == Cell::Alive
-    }
-
-    pub fn is_any_cell_alive(&self) -> bool {
-        let mut alive = false;
-
-        for &cell in self.grid.iter() {
-            if cell == Cell::Alive {
-                alive = true;
-                break;
-            }
-        }
-        
-        return alive;
-    }
-
-    pub fn get_neighbor_count(&self, row: u32, col: u32) -> u8 {
-        let mut count: u8 = 0;
-
-        let mut new_row: u32;
-        let mut new_col: u32;
-
-        // 0 1 2
-        // 3 X 4
-        // 5 6 7
-
-        // check the top left neighbor
-        if (row > 0) && (col > 0) {
-            new_row = row - 1;
-            new_col = col - 1;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        // check the top center neighbor
-        if row > 0 {
-            new_row = row - 1;
-            new_col = col;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        // check the top right neighbor
-        if (row > 0) && ((col + 1) < self.num_cols) {
-            new_row = row - 1;
-            new_col = col + 1;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        // check left neighbor
-        if col > 0 {
-            new_row = row;
-            new_col = col - 1;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        // check right neighbor
-        if (col + 1) < self.num_cols {
-            new_row = row;
-            new_col = col + 1;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        // check bottom left neighbor
-        if ((row + 1) < self.num_rows) && (col > 0) {
-            new_row = row + 1;
-            new_col = col - 1;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        // check bottom center neighbor
-        if (row + 1) < self.num_rows {
-            new_row = row + 1;
-            new_col = col;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        // check bottom left neighbor
-        if ((row + 1) < self.num_rows) && ((col + 1) < self.num_cols) {
-            new_row = row + 1;
-            new_col = col + 1;
-
-            if self.is_cell_alive(new_row, new_col) { count += 1; }
-        }
-
-        return count;
-    }
-
     fn print(&self) {
         let divider = "-".repeat(((self.num_cols * 2) + 2) as usize);
 
@@ -216,8 +122,99 @@ impl ConwaySim {
         self.generation
     }
 
+    pub fn is_cell_alive(&self, row: u32, col: u32) -> bool {
+        self.grid.get(row, col) == Cell::Alive
+    }
+
     pub fn is_any_cell_alive(&self) -> bool {
-        self.grid.is_any_cell_alive()
+        let mut alive = false;
+
+        for &cell in self.grid.grid.iter() {
+            if cell == Cell::Alive {
+                alive = true;
+                break;
+            }
+        }
+        
+        return alive;
+    }
+
+    pub fn get_neighbor_count(&self, row: u32, col: u32) -> u8 {
+        let mut count: u8 = 0;
+
+        let mut new_row: u32;
+        let mut new_col: u32;
+
+        // 0 1 2
+        // 3 X 4
+        // 5 6 7
+
+        // check the top left neighbor
+        if (row > 0) && (col > 0) {
+            new_row = row - 1;
+            new_col = col - 1;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        // check the top center neighbor
+        if row > 0 {
+            new_row = row - 1;
+            new_col = col;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        // check the top right neighbor
+        if (row > 0) && ((col + 1) < self.grid.num_cols) {
+            new_row = row - 1;
+            new_col = col + 1;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        // check left neighbor
+        if col > 0 {
+            new_row = row;
+            new_col = col - 1;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        // check right neighbor
+        if (col + 1) < self.grid.num_cols {
+            new_row = row;
+            new_col = col + 1;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        // check bottom left neighbor
+        if ((row + 1) < self.grid.num_rows) && (col > 0) {
+            new_row = row + 1;
+            new_col = col - 1;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        // check bottom center neighbor
+        if (row + 1) < self.grid.num_rows {
+            new_row = row + 1;
+            new_col = col;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        // check bottom left neighbor
+        if ((row + 1) < self.grid.num_rows)
+                && ((col + 1) < self.grid.num_cols) {
+            new_row = row + 1;
+            new_col = col + 1;
+
+            if self.is_cell_alive(new_row, new_col) { count += 1; }
+        }
+
+        return count;
     }
 
     pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
@@ -228,10 +225,10 @@ impl ConwaySim {
         let mut operations: Vec<Operation> = Vec::new();
 
         // determine the number of live neighbors to the current cell
-        let neighbor_count = self.grid.get_neighbor_count(row, col);
+        let neighbor_count = self.get_neighbor_count(row, col);
 
         // determine if the current cell is alive
-        let alive = self.grid.is_cell_alive(row, col);
+        let alive = self.is_cell_alive(row, col);
 
         // RULES FOR LIVE CELLS ///////////////////////////////////////////////
         if alive {
@@ -293,14 +290,5 @@ impl ConwaySim {
 impl fmt::Display for ConwaySim {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.grid.fmt(f)
-        // for line in self.grid.grid.as_slice().chunks(self.num_cols as usize) {
-        //     for &cell in line {
-        //         let smybol = if cell == Cell::Dead { '◻' } else { '◼' };
-        //         write!(f, "{}", smybol)?;
-        //     }
-        //     write!(f, "\n")?;
-        // }
-
-        // Ok(())
     }
 }
