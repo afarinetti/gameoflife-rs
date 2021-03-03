@@ -22,7 +22,7 @@ pub struct Grid {
 }
 
 impl Grid {
-    fn new(num_rows: u32, num_cols: u32) -> Grid {
+    pub fn new(num_rows: u32, num_cols: u32) -> Grid {
         Grid {
             num_rows: num_rows,
             num_cols: num_cols,
@@ -30,17 +30,24 @@ impl Grid {
         }
     }
 
-    fn cell_to_index(&self, row: u32, col: u32) -> usize {
+    pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
+        for (row, col) in cells.iter().cloned() {
+            let idx = self.get_index(row, col);
+            self.grid[idx] = Cell::Alive;
+        }
+    }
+
+    fn get_index(&self, row: u32, col: u32) -> usize {
         ((row * self.num_cols) + col) as usize
     }
 
     fn get(&self, row: u32, col: u32) -> Cell {
-        let index = self.cell_to_index(row, col);
+        let index = self.get_index(row, col);
         self.grid[index]
     }
 
     fn set(&mut self, row: u32, col: u32, state: Cell) {
-        let index = self.cell_to_index(row, col);
+        let index = self.get_index(row, col);
         self.grid[index] = state
     }
 
