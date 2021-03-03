@@ -1,4 +1,4 @@
-use std::fmt::{self, Display};
+use std::fmt;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Cell {
@@ -50,23 +50,6 @@ impl Grid {
         let index = self.get_index(row, col);
         self.grid[index] = state
     }
-
-    fn print(&self) {
-        let divider = "-".repeat(((self.num_cols * 2) + 2) as usize);
-
-        println!("{}", divider);
-        for row in 0..self.num_rows {
-            print!("!");
-            for col in 0..self.num_cols {
-                match self.get(row, col) {
-                    Cell::Alive => print!("* "),
-                    Cell::Dead  => print!("  "),
-                }
-            }
-            println!("|");
-        }
-        println!("{}", divider)
-    }
 }
 
 impl fmt::Display for Grid {
@@ -114,6 +97,7 @@ impl ConwaySim {
         }
     }
 
+    #[allow(dead_code)]
     pub fn new_copy(grid: Grid) -> ConwaySim {
         ConwaySim { grid, generation: 0 }
     }
