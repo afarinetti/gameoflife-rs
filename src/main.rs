@@ -1,16 +1,16 @@
 use std::fmt;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum CellState {
+pub enum Cell {
     Dead,
     Alive,
 }
 
-impl fmt::Display for CellState {
+impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            CellState::Alive => write!(f, "ALIVE"),
-            CellState::Dead  => write!(f, "DEAD"),
+            Cell::Alive => write!(f, "ALIVE"),
+            Cell::Dead  => write!(f, "DEAD"),
         }
     }
 }
@@ -18,39 +18,41 @@ impl fmt::Display for CellState {
 pub struct Grid {
     num_rows: u32,
     num_cols: u32,
-    grid: Vec<CellState>,
+    grid: Vec<Cell>,
 }
 
 impl Grid {
     fn new(num_rows: u32, num_cols: u32) -> Grid {
-        let grid = vec![CellState::Dead; (num_rows * num_cols) as usize];
-
-        Grid { num_rows, num_cols, grid }
+        Grid {
+            num_rows: num_rows,
+            num_cols: num_cols,
+            grid: vec![Cell::Dead; (num_rows * num_cols) as usize],
+        }
     }
 
     fn cell_to_index(&self, row: u32, col: u32) -> usize {
         ((row * self.num_cols) + col) as usize
     }
 
-    fn get(&self, row: u32, col: u32) -> CellState {
+    fn get(&self, row: u32, col: u32) -> Cell {
         let index = self.cell_to_index(row, col);
         self.grid[index]
     }
 
-    fn set(&mut self, row: u32, col: u32, state: CellState) {
+    fn set(&mut self, row: u32, col: u32, state: Cell) {
         let index = self.cell_to_index(row, col);
         self.grid[index] = state
     }
 
     fn is_cell_alive(&self, row: u32, col: u32) -> bool {
-        self.get(row, col) == CellState::Alive
+        self.get(row, col) == Cell::Alive
     }
 
     fn is_any_cell_alive(&self) -> bool {
         let mut alive = false;
 
         for &cell in self.grid.iter() {
-            if cell == CellState::Alive {
+            if cell == Cell::Alive {
                 alive = true;
                 break;
             }
@@ -144,8 +146,8 @@ impl Grid {
             print!("!");
             for col in 0..self.num_cols {
                 match self.get(row, col) {
-                    CellState::Alive => print!("* "),
-                    CellState::Dead  => print!("  "),
+                    Cell::Alive => print!("* "),
+                    Cell::Dead  => print!("  "),
                 }
             }
             println!("|");
@@ -154,14 +156,28 @@ impl Grid {
     }
 }
 
+impl fmt::Display for Grid {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for line in self.grid.as_slice().chunks(self.num_cols as usize) {
+            for &cell in line {
+                let smybol = if cell == Cell::Dead { '◻' } else { '◼' };
+                write!(f, "{}", smybol)?;
+            }
+            write!(f, "\n")?;
+        }
+
+        Ok(())
+    }
+}
+
 struct Operation {
     row: u32,
     col: u32,
-    state: CellState
+    state: Cell
 }
 
 impl Operation {
-    fn new(row: u32, col: u32, state: CellState) -> Operation {
+    fn new(row: u32, col: u32, state: Cell) -> Operation {
         Operation { row, col, state }
     }
 }
@@ -196,7 +212,7 @@ impl ConwaySim {
             // rule 1: any live cell with fewer than two live neighbors dies,
             //          as if caused by under-population.
             if neighbor_count < 2 {
-                operations.push(Operation::new(row, col, CellState::Dead));
+                operations.push(Operation::new(row, col, Cell::Dead));
             }
 
             // rule 2: any live cell with two or three live neigbors lives on
@@ -208,7 +224,7 @@ impl ConwaySim {
             // rule 3: any live cell with more than three neigborns dies, as if
             //          caused by overcrowding.
             else {
-                operations.push(Operation::new(row, col, CellState::Dead));
+                operations.push(Operation::new(row, col, Cell::Dead));
             }
         }
 
@@ -217,7 +233,7 @@ impl ConwaySim {
             // rule 4: any dead cell with exactly three live neighbors becomes
             //          a live cell, as if by reproduction.
             if neighbor_count == 3 {
-                operations.push(Operation::new(row, col, CellState::Alive));
+                operations.push(Operation::new(row, col, Cell::Alive));
             }
         }
 
@@ -251,16 +267,17 @@ impl ConwaySim {
 fn main() {
     let mut grid = Grid::new(5, 5);
 
-    grid.set(2, 1, CellState::Alive);
-    grid.set(2, 2, CellState::Alive);
-    grid.set(2, 3, CellState::Alive);
+    grid.set(2, 1, Cell::Alive);
+    grid.set(2, 2, Cell::Alive);
+    grid.set(2, 3, Cell::Alive);
 
     let mut sim = ConwaySim::new(grid);
 
     for _i in 0..105 {
         sim.step();
         println!("Generation: {}", sim.generation);
-        sim.grid.print();
+        // sim.grid.print();
+        print!("{}", sim.grid);
         println!("Any cell alive? {}", sim.grid.is_any_cell_alive());
         println!();
 
