@@ -98,7 +98,7 @@ impl ConwaySim {
     }
 
     #[allow(dead_code)]
-    pub fn new_copy(grid: Grid) -> ConwaySim {
+    pub fn new_with_grid(grid: Grid) -> ConwaySim {
         ConwaySim { grid, generation: 0 }
     }
 
