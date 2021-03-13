@@ -1,8 +1,12 @@
 use std::fmt;
 
+/// Representation of a Conway's Game of Life [Cell].
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Cell {
+    /// [Cell] is dead.
     Dead,
+
+    /// [Cell] is alive.
     Alive,
 }
 
@@ -15,13 +19,24 @@ impl fmt::Display for Cell {
     }
 }
 
+/// Conway's Game of Life game [Grid].
 pub struct Grid {
+    /// Number of rows (height) of the [Grid].
     num_rows: u32,
+
+    /// Number of columns (width) of the [Grid].
     num_cols: u32,
+
+    /// The game [Grid] represented as a 2D [Vec] in row-major order.
     grid: Vec<Cell>,
 }
 
 impl Grid {
+    /// Create a new [Grid] instance.
+    ///
+    /// # Arguments
+    /// * `num_rows` - The number of rows (height) of the [Grid].
+    /// * `num_cols` - The number of columns (width) of the [Grid].
     pub fn new(num_rows: u32, num_cols: u32) -> Grid {
         Grid {
             num_rows: num_rows,
@@ -30,24 +45,31 @@ impl Grid {
         }
     }
 
+    /// Set the cells of the [Grid].
+    ///
+    /// # Arguments
+    /// * `cells` - Array slice of tuples (row, col) to set as [Cell::Alive].
     pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
         for (row, col) in cells.iter().cloned() {
-            let idx = self.get_index(row, col);
+            let idx = self.cell_to_index(row, col);
             self.grid[idx] = Cell::Alive;
         }
     }
 
-    fn get_index(&self, row: u32, col: u32) -> usize {
+    /// Convert a (row, col) position to a row-major index.
+    fn cell_to_index(&self, row: u32, col: u32) -> usize {
         ((row * self.num_cols) + col) as usize
     }
 
+    /// Get a specified [Cell] of the [Grid].
     pub fn get(&self, row: u32, col: u32) -> Cell {
-        let index = self.get_index(row, col);
+        let index = self.cell_to_index(row, col);
         self.grid[index]
     }
 
+    /// Set a specified [Cell] of the [Grid].
     fn set(&mut self, row: u32, col: u32, state: Cell) {
-        let index = self.get_index(row, col);
+        let index = self.cell_to_index(row, col);
         self.grid[index] = state
     }
 }
@@ -66,13 +88,20 @@ impl fmt::Display for Grid {
     }
 }
 
+/// Represents an [Operation] to be applied to a cell of a [Grid]. 
 struct Operation {
+    /// Row of the operation.
     row: u32,
+
+    /// Column of the operation.
     col: u32,
+
+    /// The [Cell] state to apply.
     state: Cell
 }
 
 impl Operation {
+    /// Create a new [Operation].
     fn new(row: u32, col: u32, state: Cell) -> Operation {
         Operation { row, col, state }
     }
@@ -84,12 +113,21 @@ impl fmt::Display for Operation {
     }
 }
 
+/// Conway's Game of Life Simulation.
 pub struct ConwaySim {
+    /// Simulation [Grid].
     grid: Grid,
+
+    /// The simulation's current generation.
     generation: u32,
 }
 
 impl ConwaySim {
+    /// Create a new simulation.
+    ///
+    /// # Arguments
+    /// * `num_rows` - The number of rows (height) of the [Grid].
+    /// * `num_cols` - The number of columns (width) of the [Grid].
     pub fn new(num_rows: u32, num_cols: u32) -> ConwaySim {
         ConwaySim {
             grid: Grid::new(num_rows, num_cols),
